@@ -1,7 +1,9 @@
+import MorseButton from "../components/morsebutton";
+
 export default function Learn() {
     return (
         <div>
-            <h1>Learn Morse Code</h1>
+            <MorseButton></MorseButton>
         </div>
     );
 }
