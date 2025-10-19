@@ -1,9 +1,9 @@
-import MorseButton from "../components/morsebutton";
+import Trainer from "../components/trainer";
 
 export default function Learn() {
     return (
         <div>
-            <MorseButton></MorseButton>
+            <Trainer></Trainer>
         </div>
     );
 }
