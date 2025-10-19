@@ -72,6 +72,7 @@ export default function Trainer() {
         }
     }
 
+    const [submittableStyle, setSubmittableStyle] = useState(false);
     const [pressed, setPressed] = useState(false);
     const [gamePlaying, setGamePlaying] = useState(false);
     const [input, setInput] = useState<string>("");
@@ -98,16 +99,16 @@ export default function Trainer() {
             if (pressed) {
                 setPressed(false);
                 const pressDuration = Date.now() - lastPressTime.current;
-                if (pressDuration < 250) {
-                    console.log("Dot");
-                    setInput(input + '•');
-                } else if (pressDuration < 750) {
-                    console.log("Dash");
-                    setInput(input + '—');
-                } else {
-                    console.log("Too long");
+
+                if (gamePlaying) {
+                    if (pressDuration < 250 && input.length < 7) {
+                        setInput(input + '•');
+                    } else if (pressDuration < 750  && input.length < 7) {
+                        setInput(input + '—');
+                    } else {
+                        setInput('');
+                    }
                 }
-                console.log("Pressed for", pressDuration, "ms");
                 if (audioRef.current) {
                     audioRef.current.pause();
                     audioRef.current.currentTime = 0;
@@ -115,6 +116,14 @@ export default function Trainer() {
             }
         }
     }
+
+    useEffect(() => {
+        if (input.length > 0) {
+            setSubmittableStyle(true);
+        } else {
+            setSubmittableStyle(false);
+        }
+    }, [input]);
 
     function modePress(learnModePressed: boolean) {
         if (lettersPressed || numbersPressed || symbolsPressed) {
@@ -157,6 +166,7 @@ export default function Trainer() {
         if (gamePlaying) {
             if (availableCharacters.length > 0) {
                 setCharacter(availableCharacters[0]);
+                console.log("Next character:", availableCharacters[0]);
             } else {
                 setGamePlaying(false);
                 endGame();
@@ -170,16 +180,24 @@ export default function Trainer() {
     }
 
     useEffect(() => {
-        window.addEventListener('keydown', (e) => {
+
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Enter') {
-                submitInput();
+                setInput(
+                    prev => {
+                        submitInput();
+                        return prev;
+                    }
+                );
             }
-        });
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            window.removeEventListener('keydown', () => {});
+            window.removeEventListener('keydown', handleKeyDown);
         }
-    }, []);
+    }, [submitInput]);
 
     return (
         <div>
@@ -207,7 +225,7 @@ export default function Trainer() {
                         {input}
                     </div>
 
-                    <button onMouseDown={() => submitInput()} className="cursor-pointer text-lg font-bold bg-gray-800 text-gray-400 p-1 pl-6 pr-6 rounded-lg hover:text-gray-200 hover:bg-blue-800 active:text-gray-200 active:bg-blue-700 transition-colors duration-300 ease-in-out">
+                    <button onMouseDown={() => submitInput()} className={`cursor-pointer text-lg font-bold p-1 pl-6 pr-6 rounded-lg transition-colors duration-300 ease-in-out ${submittableStyle ? "bg-blue-700 text-gray-200" : "bg-gray-800 text-gray-400"}`}>
                         Submit 
                         <p className="text-sm">(Enter)</p>
                     </button>
