@@ -8,21 +8,8 @@ let socket: Socket;
 export default function Communication() {
     const [pressed, setPressed] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
-
-    function press(setToPressed: boolean) {
-        if (setToPressed) {
-            setPressed(true);
-            if (audioRef.current) {
-                audioRef.current.play();
-            }
-        } else if (pressed) {
-            setPressed(false);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            }
-        }
-    }
+    const [users, setUsers] = useState<Array<{id: string, name:string, text: string, active: boolean}>>([]);
+    const [name, setName] = useState<string>("");
 
     useEffect(() => {
         fetch('/api/socket');
@@ -31,40 +18,59 @@ export default function Communication() {
         socket.on("connect", () => {
             console.log("Connected to server");
         });
+
+        socket.on("users-update", (updatedUsers) => {
+            setUsers(updatedUsers);
+        });
+
+        socket.on("disconnect", () => {
+            console.log("Disconnected from server");
+        });
+
+        socket.on("name", (assignedName: string) => {
+            setName(assignedName);
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
+
+    function press(setToPressed: boolean) {
+        if (setToPressed) {
+            setPressed(true);
+            if (audioRef.current) {
+                audioRef.current.play();
+            }
+            socket.emit("pressed", true);
+
+        } else if (pressed) {
+            setPressed(false);
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+
+            socket.emit("pressed", false);
+        }
+    }
     
     return (
         <div>
             <div className="flex flex-row justify-left items-start h-screen gap-5 p-10 pt-25">
-
-                <div className="flex flex-row justify-between items-center gap-5 p-5 rounded-lg border-5 border-gray-700 bg-gray-800">
-                    <div className="flex flex-col justify-center items-center">
-                        <div className="h-8 w-8 border-6 rounded-full border-gray-700 bg-gray-600 hover:border-yellow-700 hover:bg-yellow-600"></div>
-                        <h1 className="text-lg">User 0</h1>
-                    </div>
-                    <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
-                        ...
-                    </div>
-                </div>
-
-                <div className="flex flex-row justify-between items-center gap-5 p-5 rounded-lg border-5 border-gray-700 bg-gray-800">
-                    <div className="flex flex-col justify-center items-center">
-                        <div className="h-8 w-8 border-6 rounded-full border-gray-700 bg-gray-600 hover:border-yellow-700 hover:bg-yellow-600"></div>
-                        <h1 className="text-lg">User 1</h1>
-                    </div>
-                    <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
-                        ...
-                    </div>
-                </div>
-                <div className="flex flex-row justify-between items-center gap-5 p-5 rounded-lg border-5 border-gray-700 bg-gray-800">
-                    <div className="flex flex-col justify-center items-center">
-                        <div className="h-8 w-8 border-6 rounded-full border-gray-700 bg-gray-600 hover:border-yellow-700 hover:bg-yellow-600"></div>
-                        <h1 className="text-lg">User 2</h1>
-                    </div>
-                    <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
-                        ...
-                    </div>
-                </div>
+                {
+                    users.map((user) => (
+                        <div key={user.id} className="flex flex-row justify-between items-center gap-5 p-5 rounded-lg border-5 border-gray-700 bg-gray-800">
+                            <div className="flex flex-col justify-center items-center">
+                                <div className={`h-8 w-8 border-6 rounded-full ${user.active ? "border-yellow-700 bg-yellow-600" : "border-gray-700 bg-gray-600"}`}></div>
+                                <h1 className="text-lg">{user.name}</h1>
+                            </div>
+                            <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
+                                {user.text || '...'}
+                            </div>
+                        </div>
+                    ))
+                }
 
             </div>
 
@@ -80,7 +86,7 @@ export default function Communication() {
                             
                         </div>
                         <div className="mt-5 text-white font-bold">
-                            User 0
+                            {name}
                         </div>
                     </div>
                 </button>
