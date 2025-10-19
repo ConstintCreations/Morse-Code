@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect, use } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Goldman } from "next/font/google";
 
 import HomePageArrow from "./homepagearrow";
