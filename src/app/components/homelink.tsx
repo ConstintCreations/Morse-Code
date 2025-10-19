@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Tomorrow } from "next/font/google";
 
 export default function HomeLink({ text,href } : { text: string; href: string }) {
     return (
