@@ -78,6 +78,9 @@ export default function Trainer() {
     const [input, setInput] = useState<string>("");
     const [character, setCharacter] = useState<string>("");
     const [availableCharacters, setAvailableCharacters] = useState<string[]>([]);
+    const [correctCount, setCorrectCount] = useState(0);
+    const [totalCharacters, setTotalCharacters] = useState(0);
+
     const audioRef = useRef<HTMLAudioElement>(null);
     const lastPressTime = useRef<number>(0);
 
@@ -101,9 +104,9 @@ export default function Trainer() {
                 const pressDuration = Date.now() - lastPressTime.current;
 
                 if (gamePlaying) {
-                    if (pressDuration < 250 && input.length < 7) {
+                    if (pressDuration < 220 && input.length < 7) {
                         setInput(input + '•');
-                    } else if (pressDuration < 750  && input.length < 7) {
+                    } else if (pressDuration < 640  && input.length < 7) {
                         setInput(input + '—');
                     } else {
                         setInput('');
@@ -142,7 +145,9 @@ export default function Trainer() {
     }
 
     function startGame() {
+        setCorrectCount(0);
         setGamePlaying(true);
+        setInput('');
         let chars: string[] = [];
         if (lettersPressed) {
             chars = chars.concat(Object.keys(characters.letters));
@@ -154,10 +159,14 @@ export default function Trainer() {
             chars = chars.concat(Object.keys(characters.symbols));
         }
         chars.sort(() => Math.random() - 0.5);
+        setTotalCharacters(chars.length);
         setAvailableCharacters(chars);
     }
 
     function submitInput() {
+        if (input == characters.letters[character as keyof typeof characters.letters] || input == characters.numbers[character as keyof typeof characters.numbers] || input == characters.symbols[character as keyof typeof characters.symbols]) {
+            setCorrectCount(correctCount + 1);
+        }
         setInput('');
         setAvailableCharacters(availableCharacters.slice(1));
     }
@@ -166,7 +175,6 @@ export default function Trainer() {
         if (gamePlaying) {
             if (availableCharacters.length > 0) {
                 setCharacter(availableCharacters[0]);
-                console.log("Next character:", availableCharacters[0]);
             } else {
                 setGamePlaying(false);
                 endGame();
@@ -177,6 +185,9 @@ export default function Trainer() {
     function endGame() {
         setCharacter("");
         setAvailableCharacters(prev => (prev.length === 0 ? prev : []));
+        setInput(`${correctCount}/${totalCharacters}`);
+        setCorrectCount(0);
+        setTotalCharacters(0);
     }
 
     useEffect(() => {
@@ -217,11 +228,12 @@ export default function Trainer() {
 
                 <div className="flex flex-col justify-center items-center gap-5 mb-5">
 
-                    <div className="flex flex-column items-center justify-center p-5 text-8xl font-mono border-4 border-gray-600 rounded-lg h-40 w-40 text-center">
+                    <div className="flex flex-col items-center justify-center p-5 text-8xl font-mono border-4 border-gray-600 rounded-lg h-40 w-40 text-center">
                         {character}
                     </div>
 
-                    <div className={`${goldman.className} flex flex-column items-center justify-center p-5 text-4xl font-mono border-4 border-gray-600 rounded-lg h-25 min-w-[300px] text-center`}>
+                    <div className={`${goldman.className} flex flex-col items-center p-5 text-4xl font-mono border-4 border-gray-600 gap-3 rounded-lg min-w-[300px] text-center ${learnMode ? "h-30" : "h-25 justify-center"}`}>
+                        <div className="text-green-600">{learnMode ? characters.letters[character as keyof typeof characters.letters] || characters.numbers[character as keyof typeof characters.numbers] || characters.symbols[character as keyof typeof characters.symbols] : ""}</div>
                         {input}
                     </div>
 
