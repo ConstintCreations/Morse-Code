@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Trainer() {
     const [pressed, setPressed] = useState(false);
@@ -41,12 +41,17 @@ export default function Trainer() {
         }
     }
 
-    document.onkeydown = function(e) {
-        if (e.key === 'Enter') {
-            console.log("Submitted:", input);
-            setInput('');
+    useEffect(() => {
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                setInput('');
+            }
+        });
+
+        return () => {
+            window.removeEventListener('keydown', () => {});
         }
-    };
+    }, []);
 
     return (
         <div>
