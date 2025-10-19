@@ -1,7 +1,9 @@
+import Communication from "../components/communication";
+
 export default function Communicate() {
     return (
         <div>
-            <h1>Communicate Morse Code</h1>
+            <Communication></Communication>
         </div>
     );
 }

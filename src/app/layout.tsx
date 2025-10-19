@@ -2,10 +2,16 @@ import type { Metadata } from "next";
 import { Tomorrow } from "next/font/google";
 import "./globals.css";
 
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+config.autoAddCss = false;
+
 const tomorrow = Tomorrow({
     subsets: ['latin'],
     weight: ['400', '700']
 });
+
+
 
 export const metadata: Metadata = {
   title: "Morse Code",

@@ -2,6 +2,8 @@
 import { useState, useRef, useEffect, use } from "react";
 import { Goldman } from "next/font/google";
 
+import HomePageArrow from "./homepagearrow";
+
 const goldman = Goldman({ 
     subsets: ['latin'], 
     weight: '400'
@@ -262,6 +264,7 @@ export default function Trainer() {
                 </div>
             </div>
             <audio ref={audioRef} src="/beep.mp3" loop></audio>
+            <HomePageArrow></HomePageArrow>
         </div>
     )
 }
