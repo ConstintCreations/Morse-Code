@@ -15,6 +15,9 @@ export default function Home() {
           <HomeLink text="Learn" href="/learn"></HomeLink>
           <HomeLink text="Communicate" href="/communicate"></HomeLink>
       </div>
+      <div className="fixed bottom-3 text-sm text-gray-500">
+        Source on <a className="underline hover:text-gray-200" href="https://github.com/ConstintCreations/Morse-Code" target="_blank">Github</a>
+      </div>
     </div>
   );
 }
