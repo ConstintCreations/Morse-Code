@@ -74,6 +74,8 @@ export default function Trainer() {
         }
     }
 
+    const [helpMenuOpen, setHelpMenuOpen] = useState<boolean>(false);
+
     const [submittableStyle, setSubmittableStyle] = useState(false);
     const [pressed, setPressed] = useState(false);
     const [gamePlaying, setGamePlaying] = useState(false);
@@ -262,6 +264,29 @@ export default function Trainer() {
                     </button>
 
                 </div>
+
+                <div className={`z-100 fixed top-0 p-5 right-0 w-100 h-full bg-gray-800 border-5 border-gray-600 rounded-tl-lg rounded-bl-lg text-white text-center translate-all duration-300 ease-in-out ${helpMenuOpen ? "right-0" : "right-[-400px]"}`}>
+                    <h1 className="text-3xl mb-3">Help</h1>
+                    <h1 className="text-2xl mb-3">Character Sets</h1>
+                    <p className="mb-2">Choose the character set(s) you want to practice.</p>
+                    <h1 className="text-2xl mb-3">Mode</h1>
+                    <p className="mb-2 flex flex-col align-items justify-center gap-1">
+                        <span><b>Learn</b> - Shows the correct answer.</span>
+                        <span><b>Practice</b> - Hides the correct answer to self-test.</span>
+                    </p>
+                    <h1 className="text-2xl mb-3">Character</h1>
+                    <p className="mb-2">This shows the current character to input in Morse code.</p>
+                    <h1 className="text-2xl mb-3">Morse Code</h1>
+                    <p className="mb-2">This shows the Morse code you input.</p>
+                    <h1 className="text-2xl mb-3">Submit</h1>
+                    <p className="mb-2">This submits your guess. Your guess can also be submitted with <span className="bg-zinc-900 p-1 rounded-md">Enter</span></p>
+                    <h1 className="text-2xl mb-3">Red Button</h1>
+                    <p className="mb-2">Press the red button shorter (•) or longer (-) to input Morse code. Hold to clear.</p>
+                </div>
+
+                <button onMouseDown={() => setHelpMenuOpen(!helpMenuOpen)} className={`fixed bottom-10 cursor-pointer left-10 flex justify-center items-center rounded-full p-5 border-5 w-10 h-10 text-2xl transition-colors duration-300 ease-in-out ${helpMenuOpen ? "bg-blue-600 border-blue-500" : "bg-gray-600 border-gray-500 hover:bg-blue-600/50 hover:border-blue-500/50"}`}>
+                        ?
+                </button>
             </div>
             <audio ref={audioRef} src="/beep.mp3" loop></audio>
             <HomePageArrow></HomePageArrow>
