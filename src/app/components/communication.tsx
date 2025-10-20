@@ -2,6 +2,12 @@
 import HomePageArrow from "./homepagearrow";
 import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import { Goldman } from "next/font/google";
+
+const goldman = Goldman({ 
+    subsets: ['latin'], 
+    weight: '400'
+});
 
 let socket: Socket;
 
@@ -68,6 +74,7 @@ export default function Communication() {
     const [users, setUsers] = useState<Array<{id: string, name:string, text: string, active: boolean}>>([]);
     const [name, setName] = useState<string>("");
     const [input, setInput] = useState<string>("");
+    const [translated, setTranslated] = useState<string>("");
     const audioRef = useRef<HTMLAudioElement>(null);
     const lastPressTime = useRef<number>(0);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -124,6 +131,7 @@ export default function Communication() {
                 if (newDotDash) {
                     setInput((prev) => {
                         const updatedInput = prev + newDotDash;
+                        setTranslated(translations[updatedInput] || '');
 
                         if (timeoutRef.current) {
                             clearTimeout(timeoutRef.current);
@@ -131,6 +139,7 @@ export default function Communication() {
                         timeoutRef.current = setTimeout(() => {
                             socket.emit("translate", translations[updatedInput] || '');
                             setInput('');
+                            setTranslated('');
                             if (clearTimeoutRef.current) {
                                 clearTimeout(clearTimeoutRef.current);
                             }
@@ -169,6 +178,18 @@ export default function Communication() {
                     ))
                 }
 
+            </div>
+
+            <div className="fixed bottom-15 left-57.5 w-full flex justify-center items-center">
+                <div className={`${goldman.className} flex flex-col items-center p-5 text-4xl font-mono border-4 border-gray-600 gap-3 rounded-lg min-w-[300px] text-center h-25 justify-center`}>
+                        {input}
+                    </div>
+            </div>
+
+            <div className="fixed bottom-15 right-32.5 w-full flex justify-center items-center">
+                <div className={`flex flex-col items-center p-5 text-7xl font-mono border-4 border-gray-600 gap-3 rounded-lg w-25 text-center h-25 justify-center bg-zinc-900`}>
+                        {translated}
+                    </div>
             </div>
 
             <div className="fixed bottom-10 left-0 w-full flex justify-center items-center">
