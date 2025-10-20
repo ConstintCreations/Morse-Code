@@ -72,6 +72,7 @@ export default function Communication() {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingText, setLoadingText] = useState<string>("");
+    const [helpMenuOpen, setHelpMenuOpen] = useState<boolean>(false);
     const [pressed, setPressed] = useState(false);
     const [users, setUsers] = useState<Array<{id: string, name:string, text: string, active: boolean}>>([]);
     const [name, setName] = useState<string>("");
@@ -209,6 +210,27 @@ export default function Communication() {
                         </div>
                 </div>
 
+                
+                <div className={`fixed top-10 p-5 left-[calc(50%-200px)] w-100 bg-gray-800 border-5 border-gray-600 rounded-lg text-white text-center translate-opacity duration-300 ease-in-out ${helpMenuOpen ? "opacity-100" : "opacity-0"}`}>
+                    <h1 className="text-2xl mb-3">Other Users</h1>
+                    <p className="mb-2">This shows other users, their Morse code input, and the translated character</p>
+                </div>
+
+                <div className={`fixed bottom-50 p-5 left-[calc(50%-160px)] w-80 bg-gray-800 border-5 border-gray-600 rounded-lg text-white text-center translate-opacity duration-300 ease-in-out ${helpMenuOpen ? "opacity-100" : "opacity-0"}`}>
+                    <h1 className="text-2xl mb-3">Button</h1>
+                    <p className="mb-2">Press (•) or hold (-) the red button to input Morse code.</p>
+                </div>
+                    
+                <div className={`fixed bottom-10 p-5 left-[calc(50%-520px)] w-80 bg-gray-800 border-5 border-gray-600 rounded-lg text-white text-center translate-opacity duration-300 ease-in-out ${helpMenuOpen ? "opacity-100" : "opacity-0"}`}>
+                    <h1 className="text-2xl mb-3">Translation</h1>
+                    <p className="mb-2">This shows the character for the Morse code you entered.</p>
+                </div>
+
+                <div className={`fixed bottom-45 p-5 left-[calc(50%+185px)] w-80 bg-gray-800 border-5 border-gray-600 rounded-lg text-white text-center translate-opacity duration-300 ease-in-out ${helpMenuOpen ? "opacity-100" : "opacity-0"}`}>
+                    <h1 className="text-2xl mb-3">Morse Code</h1>
+                    <p className="mb-2">This shows the Morse code you input.</p>
+                </div>
+
                 <div className="fixed bottom-10 left-0 w-full flex justify-center items-center">
                     <button onMouseDown={() => press(true)} onMouseLeave={() => press(false)} onMouseUp={() => press(false)} className="cursor-pointer flex flex-col justify-end items-center h-35 relative">
                         <div className={`w-20 bg-red-400 relative rounded-br-[50%] rounded-bl-[50%] border-5 border-red-800 z-20 transition-all ${pressed ? "h-10" : "h-15"}`}>
@@ -225,8 +247,10 @@ export default function Communication() {
                             </div>
                         </div>
                     </button>
+                    <button onMouseDown={() => setHelpMenuOpen(!helpMenuOpen)} className={`fixed bottom-10 cursor-pointer left-10 flex justify-center items-center rounded-full p-5 border-5 w-10 h-10 text-2xl transition-colors duration-300 ease-in-out ${helpMenuOpen ? "bg-blue-600 border-blue-500" : "bg-gray-600 border-gray-500 hover:bg-blue-600/50 hover:border-blue-500/50"}`}>
+                        ?
+                    </button>
                 </div>
-                
 
                 <audio ref={audioRef} src="/beep.mp3" loop></audio>
                 <HomePageArrow></HomePageArrow>
