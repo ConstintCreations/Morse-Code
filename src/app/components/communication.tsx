@@ -70,6 +70,7 @@ export default function Communication() {
         "•——•—•": "@",
     };
 
+    const [loading, setLoading] = useState<boolean>(true);
     const [pressed, setPressed] = useState(false);
     const [users, setUsers] = useState<Array<{id: string, name:string, text: string, active: boolean}>>([]);
     const [name, setName] = useState<string>("");
@@ -90,6 +91,9 @@ export default function Communication() {
 
         socket.on("users-update", (updatedUsers) => {
             setUsers(updatedUsers);
+            if (loading) {
+                setLoading(false);
+            }
         });
 
         socket.on("disconnect", () => {
@@ -163,56 +167,63 @@ export default function Communication() {
     
     return (
         <div>
-            <div className="flex flex-row justify-left items-start h-screen gap-5 p-10 pt-25">
-                {
-                    users.map((user) => (
-                        <div key={user.id} className="flex flex-row justify-between items-center gap-5 p-5 rounded-lg border-5 border-gray-700 bg-gray-800">
-                            <div className="flex flex-col justify-center items-center">
-                                <div className={`h-8 w-8 border-6 rounded-full ${user.active ? "border-yellow-700 bg-yellow-600" : "border-gray-700 bg-gray-600"}`}></div>
-                                <h1 className="text-lg">{user.name}</h1>
+            {loading ? (
+                <div className="flex flex-col justify-center items-center h-screen text-6xl">
+                    Loading...
+                </div>
+            ) : (
+            <div>
+                <div className="flex flex-row justify-left items-start h-screen gap-5 p-10 pt-25">
+                    {
+                        users.map((user) => (
+                            <div key={user.id} className="flex flex-row justify-between items-center gap-5 p-5 rounded-lg border-5 border-gray-700 bg-gray-800">
+                                <div className="flex flex-col justify-center items-center">
+                                    <div className={`h-8 w-8 border-6 rounded-full ${user.active ? "border-yellow-700 bg-yellow-600" : "border-gray-700 bg-gray-600"}`}></div>
+                                    <h1 className="text-lg">{user.name}</h1>
+                                </div>
+                                <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
+                                    {user.text || ''}
+                                </div>
                             </div>
-                            <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
-                                {user.text || ''}
+                        ))
+                    }
+
+                </div>
+
+                <div className="fixed bottom-15 left-57.5 w-full flex justify-center items-center">
+                    <div className={`${goldman.className} flex flex-col items-center p-5 text-4xl font-mono border-4 border-gray-600 gap-3 rounded-lg min-w-[300px] text-center h-25 justify-center`}>
+                            {input}
+                        </div>
+                </div>
+
+                <div className="fixed bottom-15 right-32.5 w-full flex justify-center items-center">
+                    <div className={`flex flex-col items-center p-5 text-7xl font-mono border-4 border-gray-600 gap-3 rounded-lg w-25 text-center h-25 justify-center bg-zinc-900`}>
+                            {translated}
+                        </div>
+                </div>
+
+                <div className="fixed bottom-10 left-0 w-full flex justify-center items-center">
+                    <button onMouseDown={() => press(true)} onMouseLeave={() => press(false)} onMouseUp={() => press(false)} className="cursor-pointer flex flex-col justify-end items-center h-35 relative">
+                        <div className={`w-20 bg-red-400 relative rounded-br-[50%] rounded-bl-[50%] border-5 border-red-800 z-20 transition-all ${pressed ? "h-10" : "h-15"}`}>
+                            <div className={`w-20 h-10 bg-red-400 rounded-[50%] border-5 border-red-800 absolute left-[-5px] transition-all ${pressed ? "top-[calc(-50%-10px)]" : "top-[calc(-33%-8px)]"}`}>
+                                
                             </div>
                         </div>
-                    ))
-                }
-
-            </div>
-
-            <div className="fixed bottom-15 left-57.5 w-full flex justify-center items-center">
-                <div className={`${goldman.className} flex flex-col items-center p-5 text-4xl font-mono border-4 border-gray-600 gap-3 rounded-lg min-w-[300px] text-center h-25 justify-center`}>
-                        {input}
-                    </div>
-            </div>
-
-            <div className="fixed bottom-15 right-32.5 w-full flex justify-center items-center">
-                <div className={`flex flex-col items-center p-5 text-7xl font-mono border-4 border-gray-600 gap-3 rounded-lg w-25 text-center h-25 justify-center bg-zinc-900`}>
-                        {translated}
-                    </div>
-            </div>
-
-            <div className="fixed bottom-10 left-0 w-full flex justify-center items-center">
-                <button onMouseDown={() => press(true)} onMouseLeave={() => press(false)} onMouseUp={() => press(false)} className="cursor-pointer flex flex-col justify-end items-center h-35 relative">
-                    <div className={`w-20 bg-red-400 relative rounded-br-[50%] rounded-bl-[50%] border-5 border-red-800 z-20 transition-all ${pressed ? "h-10" : "h-15"}`}>
-                        <div className={`w-20 h-10 bg-red-400 rounded-[50%] border-5 border-red-800 absolute left-[-5px] transition-all ${pressed ? "top-[calc(-50%-10px)]" : "top-[calc(-33%-8px)]"}`}>
-                            
+                        <div className="w-25 h-15 top-[-10px] relative z-10 bg-gray-500 border-5 rounded-bl-lg rounded-br-lg border-gray-600 text-center">
+                            <div className={`absolute w-25 h-10 bg-gray-400 border-5 border-gray-600 rounded-lg absolute left-[-5px] transition-all top-[calc(-40%-8px)]`}>
+                                
+                            </div>
+                            <div className="mt-5 text-white font-bold">
+                                {name}
+                            </div>
                         </div>
-                    </div>
-                    <div className="w-25 h-15 top-[-10px] relative z-10 bg-gray-500 border-5 rounded-bl-lg rounded-br-lg border-gray-600 text-center">
-                        <div className={`absolute w-25 h-10 bg-gray-400 border-5 border-gray-600 rounded-lg absolute left-[-5px] transition-all top-[calc(-40%-8px)]`}>
-                            
-                        </div>
-                        <div className="mt-5 text-white font-bold">
-                            {name}
-                        </div>
-                    </div>
-                </button>
-            </div>
-            
+                    </button>
+                </div>
+                
 
-            <audio ref={audioRef} src="/beep.mp3" loop></audio>
-            <HomePageArrow></HomePageArrow>
+                <audio ref={audioRef} src="/beep.mp3" loop></audio>
+                <HomePageArrow></HomePageArrow>
+            </div>)}
         </div>
     );
 }
