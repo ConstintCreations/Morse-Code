@@ -71,6 +71,7 @@ export default function Communication() {
     };
 
     const [loading, setLoading] = useState<boolean>(true);
+    const [loadingText, setLoadingText] = useState<string>("");
     const [pressed, setPressed] = useState(false);
     const [users, setUsers] = useState<Array<{id: string, name:string, text: string, active: boolean}>>([]);
     const [name, setName] = useState<string>("");
@@ -80,6 +81,12 @@ export default function Communication() {
     const lastPressTime = useRef<number>(0);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const clearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    setTimeout(() => {
+        if (loading) {
+            setLoadingText("Loading...");
+        }
+    }, 500);
 
     useEffect(() => {
         fetch('/api/socket');
@@ -169,7 +176,7 @@ export default function Communication() {
         <div>
             {loading ? (
                 <div className="flex flex-col justify-center items-center h-screen text-6xl">
-                    Loading...
+                    {loadingText}
                 </div>
             ) : (
             <div>
