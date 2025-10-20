@@ -6,10 +6,72 @@ import { io, Socket } from "socket.io-client";
 let socket: Socket;
 
 export default function Communication() {
+
+    const translations: Record<string, string> = {
+        "•—": "A",
+        "—•••": "B",
+        "—•—•": "C",
+        "—••": "D",
+        "•": "E",
+        "••—•": "F",
+        "——•": "G",
+        "••••": "H",
+        "••": "I",
+        "•———": "J",
+        "—•—": "K",
+        "•—••": "L",
+        "——": "M",
+        "—•": "N",
+        "———": "O",
+        "•——•": "P",
+        "——•—": "Q",
+        "•—•": "R",
+        "•••": "S",
+        "—": "T",
+        "••—": "U",
+        "•••—": "V",
+        "•——": "W",
+        "—••—": "X",
+        "—•——": "Y",
+        "——••": "Z",
+        "—————": "0",
+        "•————": "1",
+        "••———": "2",
+        "•••——": "3",
+        "••••—": "4",
+        "•••••": "5",
+        "—••••": "6",
+        "——•••": "7",
+        "———••": "8",
+        "————•": "9",
+        "•—•—•—": ".",
+        "——••——": ",",
+        "••——••": "?",
+        "•————•": "'",
+        "—•—•——": "!",
+        "—••—•": "/",
+        "—•——•": "(",
+        "—•——•—": ")",
+        "•—•••": "&",
+        "———•••": ":",
+        "—•—•—•": ";",
+        "—•••—": "=",
+        "•—•—•": "+",
+        "—••••—": "-",
+        "••——•—": "_",
+        "•—••—•": "\"",
+        "•••—••—": "$",
+        "•——•—•": "@",
+    };
+
     const [pressed, setPressed] = useState(false);
-    const audioRef = useRef<HTMLAudioElement>(null);
     const [users, setUsers] = useState<Array<{id: string, name:string, text: string, active: boolean}>>([]);
     const [name, setName] = useState<string>("");
+    const [input, setInput] = useState<string>("");
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const lastPressTime = useRef<number>(0);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const clearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         fetch('/api/socket');
@@ -43,15 +105,50 @@ export default function Communication() {
                 audioRef.current.play();
             }
             socket.emit("pressed", true);
+            lastPressTime.current = Date.now();
 
-        } else if (pressed) {
-            setPressed(false);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
+        } else {
+            if (pressed) {
+                setPressed(false);
+                const pressDuration = Date.now() - lastPressTime.current;
+            
+                let newDotDash = '';
+                if (pressDuration < 220 && input.length < 7) {
+                    newDotDash = "•";
+                } else if (pressDuration < 640  && input.length < 7) {
+                    newDotDash = "—";
+                } else {
+                    setInput('');
+                }
+
+                if (newDotDash) {
+                    setInput((prev) => {
+                        const updatedInput = prev + newDotDash;
+
+                        if (timeoutRef.current) {
+                            clearTimeout(timeoutRef.current);
+                        }
+                        timeoutRef.current = setTimeout(() => {
+                            socket.emit("translate", translations[updatedInput] || '');
+                            setInput('');
+                            if (clearTimeoutRef.current) {
+                                clearTimeout(clearTimeoutRef.current);
+                            }
+                            clearTimeoutRef.current = setTimeout(() => {
+                                socket.emit("translate", '');
+                            }, 1500);
+                        }, 1000);
+
+                        return updatedInput;
+                    });
+                }
+                
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                }
+                socket.emit("pressed", false);
             }
-
-            socket.emit("pressed", false);
         }
     }
     
@@ -66,7 +163,7 @@ export default function Communication() {
                                 <h1 className="text-lg">{user.name}</h1>
                             </div>
                             <div className="flex flex-col justify-center items-center border-5 border-gray-600 rounded-lg p-5 w-15 h-15 text-3xl bg-zinc-800">
-                                {user.text || '...'}
+                                {user.text || ''}
                             </div>
                         </div>
                     ))
